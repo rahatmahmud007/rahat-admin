@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRADER RAHAT — Admin Panel</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --green: #00ff66;
+    --green-dark: #00cc52;
+    --red: #ff3b3b;
+    --yellow: #ffcc00;
+    --bg: #050a08;
+    --bg-2: #0a120f;
+    --card: #0d1f14;
+    --border: rgba(0, 255, 102, 0.2);
+    --text: #e8ffe8;
+    --text-dim: #7fa88a;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(0,255,102,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(0,255,102,0.05) 0%, transparent 50%);
+  }
+
+  /* ==================== LOGIN ==================== */
+  #login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    background: linear-gradient(160deg, var(--card) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow:
+      0 0 60px rgba(0,255,102,0.15),
+      0 20px 60px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+  .login-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    border: 3px solid var(--green);
+    box-shadow: 0 0 30px rgba(0,255,102,0.6);
+    object-fit: cover;
+    display: block;
+  }
+  .login-box h1 {
+    font-size: 24px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .login-box .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    letter-spacing: 0.05em;
+  }
+  .input-wrap { position: relative; margin-bottom: 16px; }
+  .input-wrap input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .input-wrap input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,255,102,0.15);
+  }
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #052210;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn:hover {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,255,102,0.35);
+  }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: wait; }
+  .login-error {
+    min-height: 20px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  /* ==================== DASHBOARD ==================== */
+  #dashboard { display: none; padding: 24px 20px 60px; max-width: 1200px; margin: 0 auto; }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--green);
+    box-shadow: 0 0 16px rgba(0,255,102,0.5);
+    object-fit: cover;
+  }
+  .brand h2 {
+    font-size: 18px;
+    color: var(--green);
+    letter-spacing: 0.08em;
+  }
+  .brand span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+  .logout-btn {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover {
+    background: var(--red);
+    color: #fff;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: linear-gradient(160deg, var(--card) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: all 0.2s;
+  }
+  .stat-card:hover {
+    border-color: var(--green);
+    box-shadow: 0 0 24px rgba(0,255,102,0.15);
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green);
+    text-shadow: 0 0 16px rgba(0,255,102,0.4);
+  }
+  .stat-value.yellow { color: var(--yellow); text-shadow: 0 0 16px rgba(255,204,0,0.4); }
+  .stat-value.red { color: var(--red); text-shadow: 0 0 16px rgba(255,59,59,0.4); }
+
+  /* Generator */
+  .card {
+    background: linear-gradient(160deg, var(--card) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card h3 {
+    color: var(--green);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h3::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--green);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--green);
+  }
+  .gen-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .gen-row input[type="number"] {
+    width: 120px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+  }
+  .gen-row input[type="number"]:focus {
+    border-color: var(--green);
+  }
+  .gen-row .btn {
+    width: auto;
+    padding: 12px 24px;
+    flex-shrink: 0;
+  }
+
+  /* Key list */
+  .key-list { display: flex; flex-direction: column; gap: 10px; }
+  .key-item {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    transition: all 0.2s;
+  }
+  .key-item:hover {
+    border-color: rgba(0,255,102,0.5);
+    background: rgba(0,255,102,0.03);
+  }
+  .key-item.blocked {
+    border-color: rgba(255,59,59,0.3);
+    opacity: 0.7;
+  }
+  .key-info { flex: 1; min-width: 200px; }
+  .key-code {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    word-break: break-all;
+  }
+  .key-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge.active { background: rgba(0,255,102,0.15); color: var(--green); border: 1px solid rgba(0,255,102,0.4); }
+  .badge.inactive { background: rgba(255,204,0,0.15); color: var(--yellow); border: 1px solid rgba(255,204,0,0.4); }
+  .badge.blocked { background: rgba(255,59,59,0.15); color: var(--red); border: 1px solid rgba(255,59,59,0.4); }
+  .key-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .icon-btn {
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .icon-btn:hover {
+    background: rgba(0,255,102,0.15);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .icon-btn.danger:hover {
+    background: rgba(255,59,59,0.15);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .icon-btn.activate:hover {
+    background: rgba(255,204,0,0.15);
+    border-color: var(--yellow);
+    color: var(--yellow);
+  }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+    box-shadow: 0 0 30px rgba(0,255,102,0.4);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { border-color: var(--red); color: var(--red); box-shadow: 0 0 30px rgba(255,59,59,0.4); }
+
+  /* Search */
+  .search-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    margin-bottom: 14px;
+  }
+  .search-input:focus { border-color: var(--green); }
+
+  @media (max-width: 600px) {
+    .key-item { flex-direction: column; align-items: flex-start; }
+    .key-actions { width: 100%; }
+    .icon-btn { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="login-screen">
+  <div class="login-box">
+    <img src="https://i.ibb.co.com/ch7xcnN8/file-000000008bb882109df2a836ce061b44.png" class="login-logo" alt="RAHAT">
+    <h1>TRADER RAHAT</h1>
+    <p class="subtitle">Admin Panel</p>
+    <div class="input-wrap">
+      <input type="password" id="password-input" placeholder="Enter admin password" autocomplete="off">
+    </div>
+    <button class="btn" id="login-btn">🔐 Login</button>
+    <p class="login-error" id="login-error"></p>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="brand">
+      <img src="https://i.ibb.co.com/ch7xcnN8/file-000000008bb882109df2a836ce061b44.png" alt="RAHAT">
+      <div>
+        <h2>TRADER RAHAT</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <button class="logout-btn" id="logout-btn">Logout</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Keys</div>
+      <div class="stat-value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active</div>
+      <div class="stat-value" id="stat-active">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value yellow" id="stat-pending">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Blocked</div>
+      <div class="stat-value red" id="stat-blocked">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔑 Generate New Keys</h3>
+    <div class="gen-row">
+      <input type="number" id="gen-count" value="10" min="1" max="500" placeholder="How many?">
+      <button class="btn" id="gen-btn">Generate</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 All Keys (<span id="key-count">0</span>)</h3>
+    <input type="text" class="search-input" id="search-input" placeholder="Search by key or device ID...">
+    <div class="key-list" id="key-list">
+      <div class="empty-state">Loading keys...</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ==================== CONFIG ==================== */
+const ADMIN_PASSWORD = "RAHAT@2010";
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB-O9Fvm1tvoFQXTga3uCGGVBZAfMjKlnM",
+  authDomain: "fire-arena-e2025.firebaseapp.com",
+  databaseURL: "https://fire-arena-e2025-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "fire-arena-e2025",
+  storageBucket: "fire-arena-e2025.firebasestorage.app",
+  messagingSenderId: "314571742789",
+  appId: "1:314571742789:web:60d577aef0e450303acd2c"
+};
+const LOGO_URL = "https://i.ibb.co.com/ch7xcnN8/file-000000008bb882109df2a836ce061b44.png";
+
+/* ==================== LOAD FIREBASE SDK ==================== */
+let db = null;
+async function initFirebase() {
+  if (db) return db;
+  const load = (src) => new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = res;
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  await load("https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js");
+  await load("https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js");
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+  return db;
+}
+
+/* ==================== TOAST ==================== */
+function toast(msg, isError) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = isError ? "show error" : "show";
+  setTimeout(() => { el.className = ""; }, 2500);
+}
+
+/* ==================== KEY GEN ==================== */
+function makeKey() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const part = () => Array.from({ length: 4 }, () =>
+    chars[Math.floor(Math.random() * chars.length)]).join("");
+  return `RAHAT-${part()}-${part()}`;
+}
+
+/* ==================== LOGIN ==================== */
+const loginScreen = document.getElementById("login-screen");
+const dashboard = document.getElementById("dashboard");
+const passwordInput = document.getElementById("password-input");
+const loginBtn = document.getElementById("login-btn");
+const loginError = document.getElementById("login-error");
+
+function handleLogin() {
+  const pw = passwordInput.value.trim();
+  if (!pw) { loginError.textContent = "Enter password"; return; }
+  loginBtn.disabled = true;
+  loginError.textContent = "Checking...";
+  setTimeout(() => {
+    loginBtn.disabled = false;
+    if (pw === ADMIN_PASSWORD) {
+      loginScreen.style.display = "none";
+      dashboard.style.display = "block";
+      sessionStorage.setItem("rahat_admin_ok", "1");
+      loadKeys();
+    } else {
+      loginError.textContent = "❌ Wrong password";
+      passwordInput.select();
+    }
+  }, 300);
+}
+
+loginBtn.addEventListener("click", handleLogin);
+passwordInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") handleLogin();
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  sessionStorage.removeItem("rahat_admin_ok");
+  location.reload();
+});
+
+if (sessionStorage.getItem("rahat_admin_ok") === "1") {
+  loginScreen.style.display = "none";
+  dashboard.style.display = "block";
+  loadKeys();
+}
+
+/* ==================== GENERATE KEYS ==================== */
+document.getElementById("gen-btn").addEventListener("click", async () => {
+  const countInput = document.getElementById("gen-count");
+  const count = Math.max(1, Math.min(500, parseInt(countInput.value) || 10));
+  const btn = document.getElementById("gen-btn");
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+
+  try {
+    const database = await initFirebase();
+    const updates = {};
+    const newKeys = [];
+    for (let i = 0; i < count; i++) {
+      let key;
+      do { key = makeKey(); } while (updates[`licenses/${key}`]);
+      newKeys.push(key);
+      updates[`licenses/${key}`] = {
+        activated: false,
+        deviceId: null,
+        blocked: false,
+        createdAt: Date.now()
+      };
+    }
+    await database.ref().update(updates);
+    toast(`✅ Generated ${count} key${count > 1 ? "s" : ""}`);
+    countInput.value = 10;
+    loadKeys();
+    console.log("New keys:", newKeys);
+  } catch (e) {
+    console.error(e);
+    toast("❌ Error generating keys", true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate";
+  }
+});
+
+/* ==================== LOAD KEYS ==================== */
+let allKeys = [];
+
+async function loadKeys() {
+  const listEl = document.getElementById("key-list");
+  listEl.innerHTML = '<div class="empty-state">Loading...</div>';
+
+  try {
+    const database = await initFirebase();
+    const snap = await database.ref("licenses").once("value");
+    const data = snap.val() || {};
+    allKeys = Object.entries(data).map(([key, val]) => ({ key, ...val }));
+    allKeys.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    renderKeys(allKeys);
+    updateStats(allKeys);
+  } catch (e) {
+    console.error(e);
+    listEl.innerHTML = '<div class="empty-state">❌ Failed to load keys</div>';
+  }
+}
+
+function updateStats(keys) {
+  const total = keys.length;
+  const active = keys.filter(k => k.activated && !k.blocked).length;
+  const pending = keys.filter(k => !k.activated && !k.blocked).length;
+  const blocked = keys.filter(k => k.blocked).length;
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-active").textContent = active;
+  document.getElementById("stat-pending").textContent = pending;
+  document.getElementById("stat-blocked").textContent = blocked;
+}
+
+function renderKeys(keys) {
+  const listEl = document.getElementById("key-list");
+  document.getElementById("key-count").textContent = keys.length;
+
+  if (keys.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">No keys yet. Generate some above! 🔑</div>';
+    return;
+  }
+
+  listEl.innerHTML = keys.map(k => {
+    let statusBadge;
+    if (k.blocked) statusBadge = '<span class="badge blocked">Blocked</span>';
+    else if (k.activated) statusBadge = '<span class="badge active">Active</span>';
+    else statusBadge = '<span class="badge inactive">Pending</span>';
+
+    const date = k.createdAt ? new Date(k.createdAt).toLocaleString() : "—";
+    const device = k.deviceId ? `<span>📱 ${k.deviceId}</span>` : '<span>📱 Not activated</span>';
+
+    return `
+      <div class="key-item ${k.blocked ? "blocked" : ""}" data-key="${k.key}">
+        <div class="key-info">
+          <div class="key-code">${k.key}</div>
+          <div class="key-meta">
+            ${statusBadge}
+            ${device}
+            <span>📅 ${date}</span>
+          </div>
+        </div>
+        <div class="key-actions">
+          <button class="icon-btn" onclick="copyKey('${k.key}')">📋 Copy</button>
+          ${!k.activated ? `<button class="icon-btn activate" onclick="promptActivate('${k.key}')">✅ Activate</button>` : ''}
+          ${k.activated ? `<button class="icon-btn activate" onclick="resetDevice('${k.key}')">🔄 Reset</button>` : ''}
+          <button class="icon-btn ${k.blocked ? '' : 'danger'}" onclick="toggleBlock('${k.key}', ${!!k.blocked})">
+            ${k.blocked ? '🟢 Unblock' : '🚫 Block'}
+          </button>
+          <button class="icon-btn danger" onclick="deleteKey('${k.key}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ==================== ACTIONS ==================== */
+function copyKey(key) {
+  navigator.clipboard.writeText(key).then(() => {
+    toast("📋 Copied: " + key);
+  }).catch(() => {
+    const ta = document.createElement("textarea");
+    ta.value = key;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    toast("📋 Copied!");
+  });
+}
+
+async function promptActivate(key) {
+  const deviceId = prompt(
+    "Enter the Device ID from the buyer:\n(e.g., FP-xxxxx)\n\nKey: " + key
+  );
+  if (!deviceId) return;
+  const trimmed = deviceId.trim();
+  if (!trimmed) return;
+
+  try {
+    const database = await initFirebase();
+    await database.ref("licenses/" + key).update({
+      activated: true,
+      deviceId: trimmed
+    });
+    toast("✅ Activated: " + key);
+    loadKeys();
+  } catch (e) {
+    console.error(e);
+    toast("❌ Failed to activate", true);
+  }
+}
+
+async function resetDevice(key) {
+  if (!confirm("Reset device lock for " + key + "?\n\nThe buyer will need to re-activate.")) return;
+  try {
+    const database = await initFirebase();
+    await database.ref("licenses/" + key).update({
+      activated: false,
+      deviceId: null
+    });
+    toast("🔄 Device reset: " + key);
+    loadKeys();
+  } catch (e) {
+    console.error(e);
+    toast("❌ Failed to reset", true);
+  }
+}
+
+async function toggleBlock(key, isBlocked) {
+  const action = isBlocked ? "Unblock" : "Block";
+  if (!confirm(action + " key: " + key + "?")) return;
+  try {
+    const database = await initFirebase();
+    await database.ref("licenses/" + key).update({ blocked: !isBlocked });
+    toast((isBlocked ? "🟢 Unblocked: " : "🚫 Blocked: ") + key);
+    loadKeys();
+  } catch (e) {
+    console.error(e);
+    toast("❌ Failed to " + action.toLowerCase(), true);
+  }
+}
+
+async function deleteKey(key) {
+  if (!confirm("🗑️ Permanently delete: " + key + "?\n\nThis cannot be undone!")) return;
+  try {
+    const database = await initFirebase();
+    await database.ref("licenses/" + key).remove();
+    toast("🗑️ Deleted: " + key);
+    loadKeys();
+  } catch (e) {
+    console.error(e);
+    toast("❌ Failed to delete", true);
+  }
+}
+
+/* ==================== SEARCH ==================== */
+document.getElementById("search-input").addEventListener("input", (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) { renderKeys(allKeys); return; }
+  const filtered = allKeys.filter(k =>
+    k.key.toLowerCase().includes(q) ||
+    (k.deviceId && k.deviceId.toLowerCase().includes(q))
+  );
+  renderKeys(filtered);
+});
+</script>
+</body>
+  </html>
